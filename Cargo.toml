@@ -1,0 +1,8 @@
+[package]
+name = "zmq_mempool"
+version = "0.1.0"
+edition = "2023"
+
+[dependencies]
+zmq="0.10"
+
