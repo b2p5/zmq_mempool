@@ -1,7 +1,7 @@
 [package]
 name = "zmq_mempool"
 version = "0.1.0"
-edition = "2021"  # o "2018", dependiendo de tus necesidades
+edition = "2021"  
 
 [dependencies]
 zmq="0.10"
