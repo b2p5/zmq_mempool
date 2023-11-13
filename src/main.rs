@@ -48,8 +48,7 @@ fn mempool_subscriber() -> Result<(), Box<dyn std::error::Error>> {
         let tx_hex = match subscriber.recv_bytes(0) {
             Ok(tx) => tx,
             Err(e) => {
-                // Handle the zmq::Error
-                // For now, let's return the error
+                // Manejar el zmq::Error
                 return Err(e.into());
             },
         };
