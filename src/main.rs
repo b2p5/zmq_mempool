@@ -66,7 +66,8 @@ fn main() {
     // Iniciar el suscriptor en el hilo principal
     match mempool_subscriber() {
         Ok(_) => {
-            // La función se ejecutó con éxito, podemos continuar con nuestro código  
+            // La función se ejecutó con éxito, podemos continuar con nuestro código 
+            println!("Terminado"); 
         },
         Err(e) => {
             // Hubo un error al ejecutar la función, puedes manejarlo aquí
