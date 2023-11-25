@@ -1,11 +1,18 @@
-//
-// Ejemplo de suscripción al nodo de Bitcoin usando ZeroMQ
-//  
+//! This is an example of subscribing to a Bitcoin node using ZeroMQ.
+//!
+//! The `mempool_subscriber` function creates a ZeroMQ context and a SUB socket, connects to a Bitcoin node,
+//! subscribes to mempool-related events, and receives and processes messages.
+//!
+//! The main function calls `mempool_subscriber` and handles any errors that occur during execution.
+//!
+
 
 
 use std::thread;
 use std::time::Duration;
 use zmq::Context;
+
+use rustc_hex::ToHex;
 
 fn mempool_subscriber() -> Result<(), Box<dyn std::error::Error>> {
     
@@ -28,35 +35,37 @@ fn mempool_subscriber() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     // Suscribirse a eventos relacionados con la mempool
-    if let Err(e) = subscriber.set_subscribe(b"rawtx") {
+    if let Err(e) = subscriber.set_subscribe(b"hashtx") {
+    //if let Err(e) = subscriber.set_subscribe(b"rawtx") {
         eprintln!("Error al suscribirse: {:?}", e);
         return Err(e.into());
     }
 
     // Recibir y procesar mensajes
     loop {
-        // El primer mensaje contiene el canal de suscripción, por lo que lo descartamos
-        let _ = match subscriber.recv_bytes(0) {
-            Ok(channel) => channel,
-            Err(e) => {
-                eprintln!("Error al recibir el canal: {:?}", e);
-                continue;
-            }
-        };
-        
-        // El segundo mensaje contiene la transacción en formato hexadecimal
+        // El segundo mensaje contiene el contenido del mensaje
         let tx_hex = match subscriber.recv_bytes(0) {
-            Ok(tx) => tx,
+            
+            Ok(tx_hex) => {
+                // Convert bytes to a hexadecimal string
+                let hex_string = tx_hex.to_hex::<String>();
+                Some(hex_string)
+            },
             Err(e) => {
-                // Manejar el zmq::Error
-                return Err(e.into());
+                println!("Failed to receive bytes: {}", e);
+                None
             },
         };
-
+        
+        let tx_hex = match tx_hex {
+            Some(tx) => tx,
+            None => String::from("No transaction received"),
+        };
+        
         println!("Received transaction: {:?}", tx_hex);
-
+        
         // Pausar para evitar un consumo excesivo de recursos
-        thread::sleep(Duration::from_secs(5));
+        thread::sleep(Duration::from_secs(1));
     
     }   // Fin del loop
 
